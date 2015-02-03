@@ -1,0 +1,60 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "jobCollectionName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2014-08-01-preview",
+      "name": "[parameters('jobCollectionName')]",
+      "type": "Microsoft.Scheduler/jobCollections",
+      "location": "North Central US",
+      "properties": {
+        "sku": {
+          "name": "standard"
+        },
+        "quota": {
+          "maxJobCount": "10",
+          "maxRecurrence": {
+            "Frequency": "minute",
+            "interval": "1"
+          }
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2014-08-01-preview",
+          "name": "DavidJob",
+          "type": "jobs",
+          "dependsOn": [
+            "[resourceId('Microsoft.Scheduler/jobCollections', parameters('jobCollectionName'))]"
+          ],
+          "properties": {
+            "startTime": "2014-07-23T00:08:00Z",
+            "action": {
+              "request": {
+                "uri": "http://requestb.in/olvu48ol",
+                "method": "GET",
+                "headers": {}
+              },
+              "type": "http",
+              "retryPolicy": {
+                "retryType": "Fixed",
+                "retryInterval": "PT1M",
+                "retryCount": 2
+              }
+            },
+            "state": "enabled",
+            "recurrence": {
+              "frequency": "minute",
+              "interval": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
